@@ -66,7 +66,8 @@
       let rate = (priceBuy - priceMin) / (priceCurrent - priceMin);
       if(stock.value === ''){
         let percent = Math.round(rate * 10000) / 100;
-        result.innerText = `以目前的价格卖掉手头上至少 ${percent}% 的大头菜并且剩下的 ${100-percent}% 大头菜以预计最低价 ${priceMin} 售出就能保证回本。`;
+        let leftover = Math.round((1 - rate) * 10000) / 100
+        result.innerText = `以目前的价格卖掉手头上至少 ${percent}% 的大头菜并且剩下的 ${leftover}% 大头菜以预计最低价 ${priceMin} 售出就能保证回本。`;
         return;
       }
       let sellAmount = Math.ceil(Math.floor(stockAmount / 10) * rate) * 10;
