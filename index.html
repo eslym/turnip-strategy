@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大头菜售卖策略计算机</title>
+    <style>
+      #calc, #calc input, #calc button {
+        font-size: larger;
+      }
+      #calc input {
+         width: 500px;
+      }
+      #calc input:invalid{
+        border-color: red;
+      }
+      #calc > div {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>大头菜售卖策略计算机</h1>
+    <form id="calc">
+      <div>
+        <label>购买价格：</label> <input name="buy" type="number" min="90" placeholder="星期日时购买大头菜的价格" required>
+      </div>
+      <div>
+        <label>当前价格：</label> <input name="current" type="number" min="1" placeholder="店铺当下的大头菜收购价格" required>
+      </div>
+      <div>
+        <label>预计最低：</label> <input name="min" type="number" min="1" placeholder="预计星期六下午的最低收购价格" required>
+      </div>
+      <div>
+        <label>当前存货：</label> <input name="stock" type="number" min="10" placeholder="目前所拥有的大头菜存货">
+      </div>
+      <div><button type="submit">计算策略</button></div>
+      <p id=result></p>
+    </form>
+  </body>
+  <script>
+    const calc = document.getElementById('calc');
+    const buy = calc.querySelector('[name=buy]');
+    const current = calc.querySelector('[name=current]');
+    const min = calc.querySelector('[name=min]');
+    const stock = calc.querySelector('[name=stock]');
+    const result = document.getElementById('result');
+    calc.addEventListener('submit', (event)=>{
+      if(!calc.checkValidity()){
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      let priceBuy = Number.parseInt(buy.value);
+      let priceCurrent = Number.parseInt(current.value);
+      let priceMin = Number.parseInt(min.value);
+      let stockAmount = Number.parseInt(stock.value);
+      if(priceCurrent < priceBuy){
+        result.innerText = "现在卖怎么卖都不可能回本，自己看着办吧。";
+        return;
+      }
+      if(priceMin >= priceBuy) {
+        result.innerText = "由于在预计的最低价卖出所有的大头菜也能够回本，因此留多少大头菜下来赌更高的价格都没关系。";
+        return;
+      }
+      let rate = (priceBuy - priceMin) / (priceCurrent - priceMin);
+      if(stock.value === ''){
+        let percent = Math.round(rate * 10000) / 100;
+        result.innerText = `以目前的价格卖掉手头上至少 ${percent}% 的大头菜并且剩下的 ${100-percent}% 大头菜以预计最低价 ${priceMin} 售出就能保证回本。`;
+        return;
+      }
+      let sellAmount = Math.ceil(Math.floor(stockAmount / 10) * rate) * 10;
+      let keepAmount = stockAmount - sellAmount;
+      let totalCurrent = sellAmount * priceCurrent;
+      let totalKeep = keepAmount * priceMin;
+      result.innerHTML = `以目前的价格卖掉手头上至少 ${sellAmount} 颗大头菜可得至少 ${totalCurrent} 铃钱，<br/>`;
+      result.innerHTML += `剩余的 ${keepAmount} 颗大头菜在最糟糕的情况下可卖出 ${totalKeep} 铃钱，<br/>`;
+      result.innerHTML += `${totalCurrent} + ${totalKeep} = ${totalCurrent + totalKeep} 足以保证赚回成本价 ${stockAmount * priceBuy} 铃钱。`;
+    });
+  </script>
+</html>
